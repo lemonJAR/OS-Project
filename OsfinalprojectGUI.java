@@ -186,7 +186,7 @@ public class OsfinalprojectGUI extends JFrame {
             metricsTextArea.setText("");
             avgTurnaroundLabel.setText("Average Turnaround Time: N/A");
             avgResponseLabel.setText("Average Response Time: N/A");
-            ganttChartPanel.setGanttEntries(new ArrayList<>()); // Clear Gantt chart
+            ganttChartPanel.setGanttChart(new ArrayList<>()); // Clear Gantt chart
 
             int numProc;
             try {
@@ -312,7 +312,7 @@ public class OsfinalprojectGUI extends JFrame {
                 avgResponseLabel.setText(String.format("Average Response Time: %.2f", totalResponse / processesForSimulation.size()));
 
                 // Update Gantt Chart
-                ganttChartPanel.setGanttEntries(scheduler.ganttChart);
+                ganttChartPanel.setGanttChart(scheduler.ganttChart);
             }
         }
     }
