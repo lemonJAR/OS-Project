@@ -1,2 +1,21 @@
 # OS-Project
-This project is about CPU Scheduling Visualization
+Project Overview:
+
+This project is a **CPU Scheduling Visualizer** built in Java. It lets users simulate different CPU scheduling algorithms like **FCFS, SJF, SRTF, Round Robin**, and **MLFQ**. Users can enter processes manually or generate them randomly. The results are shown as an Gantt chart with key process metrics such as completion time, turnaround time, and response time.
+
+HOW TO RUN THE SIMULATION:
+- When you execute the program, the simulator should appear
+
+- When opening the simulator, you are given a choice at the top left of the window a choice to either manually input the processes or randomly generate the processes under that is a text box to type the amount of processes you wish to input.
+
+- When choosing the Manual Input option, below is a box entitled "Process Details (PID, Arrival, Burst). In this box you can Input the Arrival Time and Burst Time of the processes individually.
+
+- Then at the bottom left of the simulator you can select the algorithms you wish to run or simulate.
+  *Note - Round Robin requires you to input 1 time quantum. While MLFQ requries you to input 4 quantum slices seperated by a comma (1,2,3,4)
+
+- Then you can press the Run Simulation button to visualize the processes.
+
+Member Roles And Contributions:
+- Edcel Christian Repollo was tasked to finish the ui, gantt chartt, srtf, round robin, and mlfq
+
+- John Anthony Romeo was taskes to finsih the process, scheduler, FIFO, SJF
