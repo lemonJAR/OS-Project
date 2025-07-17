@@ -49,10 +49,10 @@ public class Osfinalproject {
                 scheduler = new FIFO(processes);
                 break;
             case 2:
-                //SJF
+                scheduler = new SJF(processes);
                 break;
             case 3:
-                //SRTF
+                scheduler = new SRTF(processes);
                 break;
             case 4:
                 //round robin
