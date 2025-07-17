@@ -15,6 +15,8 @@ HOW TO RUN THE SIMULATION:
 
 - Then you can press the Run Simulation button to visualize the processes.
 
+    <img width="1218" height="847" alt="Screenshot 2025-07-18 003932" src="https://github.com/user-attachments/assets/331995e2-181a-4ef2-bdd0-2396b50ae5c0" />
+
 Member Roles And Contributions:
 - Edcel Christian Repollo was tasked to finish the ui, gantt chartt, srtf, round robin, and mlfq
 
