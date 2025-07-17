@@ -59,7 +59,13 @@ public class RoundRobin extends Scheduler {
             while (!processList.isEmpty() && processList.get(0).arrivalTime <= currentTime) {
                 readyQueue.add(processList.remove(0));
             }
-
+            
+            if (current.remainingBurstTime > 0) {
+                readyQueue.add(current);
+            } else {
+                current.completionTime = currentTime;
+                current.turnaroundTime = currentTime - current.arrivalTime;
+            }
         }
         
         printMetrics();
