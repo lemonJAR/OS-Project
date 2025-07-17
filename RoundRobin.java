@@ -49,10 +49,17 @@ public class RoundRobin extends Scheduler {
                 current.isResponded = true;
             }
             
+            int execTime = Math.min(current.remainingBurstTime, timeQuantum);
+            ganttChart.add(new GanttEntry(current.id, currentTime, currentTime + execTime));
+            
+            currentTime += execTime;
+            current.remainingBurstTime -= execTime;
+            
             // Add arriving processes during execution
             while (!processList.isEmpty() && processList.get(0).arrivalTime <= currentTime) {
                 readyQueue.add(processList.remove(0));
             }
+
         }
         
         printMetrics();
