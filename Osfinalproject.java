@@ -60,7 +60,14 @@ public class Osfinalproject {
                 scheduler = new RoundRobin(processes, rrQuantum);
                 break;
             case 5:
-                //mlfq
+                System.out.println("Enter Time Quantums for MLFQ (comma-separated) for Q0,Q1,Q2,Q3:");
+                scanner.nextLine(); // Consume newline
+                String[] quantumStrings = scanner.nextLine().split(",");
+                int[] mlfqQuantums = new int[quantumStrings.length];
+                for (int i = 0; i < quantumStrings.length; i++) {
+                    mlfqQuantums[i] = Integer.parseInt(quantumStrings[i].trim());
+                }
+                scheduler = new MLFQ(processes, mlfqQuantums);
                 break;
             default:
                 System.out.println("Invalid choice.");
