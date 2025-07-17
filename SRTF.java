@@ -13,61 +13,86 @@ public class SRTF extends Scheduler {
 
     @Override
     public void schedule() {
-        System.out.println("\nSRTF Scheduling:");
-        Collections.sort(processes, Comparator.comparingInt(p -> p.arrivalTime));
-        
+        System.out.println("\nSRTF Scheduling (Tick-by-Tick Gantt):");
+        // Create a copy to avoid modifying the original list
+        List<Process> processesCopy = new ArrayList<>(processes);
+        Collections.sort(processesCopy, Comparator.comparingInt(p -> p.arrivalTime));
+
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(
             Comparator.comparingInt((Process p) -> p.remainingBurstTime)
                     .thenComparingInt(p -> p.arrivalTime)
         );
-        
+
         int currentTime = 0;
-        int lastSwitchTime = 0;
+        int processIndex = 0; // To track processes from the sorted copy
         Process currentProcess = null;
-        
+        int lastExecutionStartTime = 0; // To track when the current process started its current continuous execution block
+
         while (true) {
-            // Add arriving processes
-            while (!processes.isEmpty() && processes.get(0).arrivalTime <= currentTime) {
-                Process p = processes.remove(0);
-                p.remainingBurstTime = p.burstTime;
+            // Add arriving processes to ready queue
+            while (processIndex < processesCopy.size() && processesCopy.get(processIndex).arrivalTime <= currentTime) {
+                Process p = processesCopy.get(processIndex++);
+                p.remainingBurstTime = p.burstTime; // Ensure remainingBurstTime is set for the copy
                 readyQueue.add(p);
             }
-            
-            // Check for preemption
-            if (currentProcess != null && !readyQueue.isEmpty() &&
-                readyQueue.peek().remainingBurstTime < currentProcess.remainingBurstTime) {
-                readyQueue.add(currentProcess);
-                currentProcess = readyQueue.poll();
-                ganttChart.add(new GanttEntry(currentProcess.id, lastSwitchTime, currentTime));
-                lastSwitchTime = currentTime;
+
+            // Determine the next process to run
+            Process nextProcess = null;
+            if (currentProcess != null) {
+                nextProcess = currentProcess; // Assume current process continues
             }
-            
-            if (currentProcess == null && !readyQueue.isEmpty()) {
-                currentProcess = readyQueue.poll();
+            if (!readyQueue.isEmpty()) {
+                if (nextProcess == null || readyQueue.peek().remainingBurstTime < nextProcess.remainingBurstTime) {
+                    nextProcess = readyQueue.poll();
+                    if (currentProcess != null && currentProcess != nextProcess) {
+                        // Current process is preempted, add it back to ready queue
+                        readyQueue.add(currentProcess);
+                    }
+                }
+            }
+
+            // Record Gantt entry for the previous block if process switched or finished
+            if (currentProcess != null && currentProcess != nextProcess) {
+                // Process switched or finished, record the block
+                for (int i = lastExecutionStartTime; i < currentTime; i++) {
+                    ganttChart.add(new GanttEntry(currentProcess.id, i, i + 1));
+                }
+            }
+
+            currentProcess = nextProcess;
+
+            if (currentProcess == null) {
+                // CPU is idle
+                if (processIndex == processesCopy.size() && readyQueue.isEmpty()) {
+                    // All processes arrived and completed
+                    break;
+                }
+                // Record idle tick
+                ganttChart.add(new GanttEntry(-1, currentTime, currentTime + 1));
+                currentTime++;
+                lastExecutionStartTime = currentTime; // Reset for next process
+            } else {
+                // Process is running
                 if (!currentProcess.isResponded) {
                     currentProcess.responseTime = currentTime - currentProcess.arrivalTime;
                     currentProcess.isResponded = true;
                 }
-                lastSwitchTime = currentTime;
-            }
-            
-            if (currentProcess != null) {
+
+                // Record current tick
+                ganttChart.add(new GanttEntry(currentProcess.id, currentTime, currentTime + 1));
                 currentTime++;
                 currentProcess.remainingBurstTime--;
-                
+
                 if (currentProcess.remainingBurstTime == 0) {
-                    ganttChart.add(new GanttEntry(currentProcess.id, lastSwitchTime, currentTime));
+                    // Process completed
                     currentProcess.completionTime = currentTime;
                     currentProcess.turnaroundTime = currentTime - currentProcess.arrivalTime;
-                    currentProcess = null;
+                    currentProcess = null; // No current process
+                    lastExecutionStartTime = currentTime; // Reset for next process
                 }
-            } else {
-                if (processes.isEmpty()) break;
-                ganttChart.add(new GanttEntry(-1, currentTime, currentTime + 1));
-                currentTime++;
             }
         }
-        
+
         printMetrics();
         printAverages();
     }

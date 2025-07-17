@@ -13,29 +13,36 @@ public class FIFO extends Scheduler {
 
     @Override
     public void schedule() {
-        System.out.println("\nFIFO Scheduling:");
-        Collections.sort(processes, Comparator.comparingInt(p -> p.arrivalTime));
-        
+        System.out.println("\nFIFO Scheduling (Tick-by-Tick Gantt):");
+        // Create a copy to avoid modifying the original list
+        List<Process> processesCopy = new ArrayList<>(processes);
+        Collections.sort(processesCopy, Comparator.comparingInt(p -> p.arrivalTime));
+
         int currentTime = 0;
-        for (Process p : processes) {
+        for (Process p : processesCopy) { // Use the copy
+            // Handle idle time
             if (currentTime < p.arrivalTime) {
-                ganttChart.add(new GanttEntry(-1, currentTime, p.arrivalTime));
+                for (int i = currentTime; i < p.arrivalTime; i++) {
+                    ganttChart.add(new GanttEntry(-1, i, i + 1)); // Record idle tick
+                }
                 currentTime = p.arrivalTime;
             }
-            
+
             if (!p.isResponded) {
                 p.responseTime = currentTime - p.arrivalTime;
                 p.isResponded = true;
             }
-            
-            int startTime = currentTime;
+
+            // Execute process tick by tick
+            for (int i = 0; i < p.burstTime; i++) {
+                ganttChart.add(new GanttEntry(p.id, currentTime + i, currentTime + i + 1)); // Record process tick
+            }
             currentTime += p.burstTime;
-            ganttChart.add(new GanttEntry(p.id, startTime, currentTime));
-            
+
             p.completionTime = currentTime;
             p.turnaroundTime = currentTime - p.arrivalTime;
         }
-        
+
         printMetrics();
         printAverages();
     }

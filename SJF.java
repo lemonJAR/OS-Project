@@ -13,42 +13,52 @@ public class SJF extends Scheduler {
 
     @Override
     public void schedule() {
-        System.out.println("\nSJF Scheduling:");
-        Collections.sort(processes, Comparator.comparingInt(p -> p.arrivalTime));
-        
+        System.out.println("\nSJF Scheduling (Tick-by-Tick Gantt):");
+        // Create a copy to avoid modifying the original list
+        List<Process> processesCopy = new ArrayList<>(processes);
+        Collections.sort(processesCopy, Comparator.comparingInt(p -> p.arrivalTime));
+
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(
             Comparator.comparingInt((Process p) -> p.burstTime)
                      .thenComparingInt(p -> p.arrivalTime)
         );
-        
+
         int currentTime = 0;
-        int index = 0;
-        
-        while (index < processes.size() || !readyQueue.isEmpty()) {
-            while (index < processes.size() && processes.get(index).arrivalTime <= currentTime) {
-                readyQueue.add(processes.get(index++));
+        int processIndex = 0; // To track processes from the sorted copy
+
+        while (processIndex < processesCopy.size() || !readyQueue.isEmpty()) {
+            // Add arriving processes to ready queue
+            while (processIndex < processesCopy.size() && processesCopy.get(processIndex).arrivalTime <= currentTime) {
+                readyQueue.add(processesCopy.get(processIndex++));
             }
-            
+
             if (readyQueue.isEmpty()) {
-                int nextArrival = index < processes.size() ? processes.get(index).arrivalTime : currentTime + 1;
-                ganttChart.add(new GanttEntry(-1, currentTime, nextArrival));
+                // Handle idle time
+                int nextArrival = processIndex < processesCopy.size() ? processesCopy.get(processIndex).arrivalTime : currentTime + 1;
+                for (int i = currentTime; i < nextArrival; i++) {
+                    ganttChart.add(new GanttEntry(-1, i, i + 1)); // Record idle tick
+                }
                 currentTime = nextArrival;
                 continue;
             }
-            
+
             Process p = readyQueue.poll();
-            
+
             if (!p.isResponded) {
                 p.responseTime = currentTime - p.arrivalTime;
                 p.isResponded = true;
             }
-            
-            ganttChart.add(new GanttEntry(p.id, currentTime, currentTime + p.burstTime));
+
+            // Execute process tick by tick
+            for (int i = 0; i < p.burstTime; i++) {
+                ganttChart.add(new GanttEntry(p.id, currentTime + i, currentTime + i + 1)); // Record process tick
+            }
             currentTime += p.burstTime;
+
             p.completionTime = currentTime;
             p.turnaroundTime = currentTime - p.arrivalTime;
         }
-        
+
         printMetrics();
         printAverages();
     }
