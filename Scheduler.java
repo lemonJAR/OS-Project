@@ -50,9 +50,9 @@ public abstract class Scheduler {
         System.out.print("Proc: ");
         for (GanttEntry entry : ganttChart) {
             if (entry.processId == -1) {
-                System.out.print("-- ");
+                System.out.print(" -- ");
             } else {
-                System.out.printf("P%-2d", entry.processId);
+                System.out.printf(" P%-2d", entry.processId);
             }
         }
         System.out.println();
