@@ -26,11 +26,24 @@ public abstract class Scheduler {
         }
     }
 
+    protected void printAverages() {
+        double totalTurnaround = 0;
+        double totalResponse = 0;
+        
+        for (Process p : processes) {
+            totalTurnaround += p.turnaroundTime;
+            totalResponse += p.responseTime;
+        }
+        
+        System.out.printf("\nAverage Turnaround Time: %.2f%n", totalTurnaround / processes.size());
+        System.out.printf("Average Response Time: %.2f%n", totalResponse / processes.size());
+    }
+
     public void printGanttChart() {
         System.out.println("\nGantt Chart:");
         System.out.print("Time: ");
         for (GanttEntry entry : ganttChart) {
-            System.out.printf("%2d ", entry.startTime);
+            System.out.printf("%3d ", entry.startTime);
         }
         System.out.println(ganttChart.get(ganttChart.size()-1).endTime);
         
@@ -39,7 +52,7 @@ public abstract class Scheduler {
             if (entry.processId == -1) {
                 System.out.print("-- ");
             } else {
-                System.out.printf("P%d ", entry.processId);
+                System.out.printf("P%-2d", entry.processId);
             }
         }
         System.out.println();

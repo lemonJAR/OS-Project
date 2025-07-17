@@ -18,23 +18,22 @@ public class SRTF extends Scheduler {
         
         PriorityQueue<Process> readyQueue = new PriorityQueue<>(
             Comparator.comparingInt((Process p) -> p.remainingBurstTime)
-                      .thenComparingInt(p -> p.id)
+                    .thenComparingInt(p -> p.arrivalTime)
         );
         
         int currentTime = 0;
-        int index = 0;
-        Process currentProcess = null;
         int lastSwitchTime = 0;
+        Process currentProcess = null;
         
-        while (index < processes.size() || !readyQueue.isEmpty() || currentProcess != null) {
-            // Add arriving processes to ready queue
-            while (index < processes.size() && processes.get(index).arrivalTime <= currentTime) {
-                Process p = processes.get(index++);
+        while (true) {
+            // Add arriving processes
+            while (!processes.isEmpty() && processes.get(0).arrivalTime <= currentTime) {
+                Process p = processes.remove(0);
                 p.remainingBurstTime = p.burstTime;
                 readyQueue.add(p);
             }
             
-            // Check if we should preempt
+            // Check for preemption
             if (currentProcess != null && !readyQueue.isEmpty() &&
                 readyQueue.peek().remainingBurstTime < currentProcess.remainingBurstTime) {
                 readyQueue.add(currentProcess);
@@ -45,8 +44,9 @@ public class SRTF extends Scheduler {
             
             if (currentProcess == null && !readyQueue.isEmpty()) {
                 currentProcess = readyQueue.poll();
-                if (currentProcess.responseTime == -1) {
+                if (!currentProcess.isResponded) {
                     currentProcess.responseTime = currentTime - currentProcess.arrivalTime;
+                    currentProcess.isResponded = true;
                 }
                 lastSwitchTime = currentTime;
             }
@@ -62,13 +62,13 @@ public class SRTF extends Scheduler {
                     currentProcess = null;
                 }
             } else {
-                // Idle time
-                int nextArrival = index < processes.size() ? processes.get(index).arrivalTime : currentTime + 1;
-                ganttChart.add(new GanttEntry(-1, currentTime, nextArrival));
-                currentTime = nextArrival;
+                if (processes.isEmpty()) break;
+                ganttChart.add(new GanttEntry(-1, currentTime, currentTime + 1));
+                currentTime++;
             }
         }
         
         printMetrics();
+        printAverages();
     }
 }

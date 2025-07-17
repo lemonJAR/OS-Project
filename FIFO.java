@@ -19,9 +19,13 @@ public class FIFO extends Scheduler {
         int currentTime = 0;
         for (Process p : processes) {
             if (currentTime < p.arrivalTime) {
-                // Idle time
                 ganttChart.add(new GanttEntry(-1, currentTime, p.arrivalTime));
                 currentTime = p.arrivalTime;
+            }
+            
+            if (!p.isResponded) {
+                p.responseTime = currentTime - p.arrivalTime;
+                p.isResponded = true;
             }
             
             int startTime = currentTime;
@@ -29,10 +33,10 @@ public class FIFO extends Scheduler {
             ganttChart.add(new GanttEntry(p.id, startTime, currentTime));
             
             p.completionTime = currentTime;
-            p.turnaroundTime = p.completionTime - p.arrivalTime;
-            p.responseTime = p.turnaroundTime; // For FIFO, response time = turnaround time
+            p.turnaroundTime = currentTime - p.arrivalTime;
         }
         
         printMetrics();
+        printAverages();
     }
 }
