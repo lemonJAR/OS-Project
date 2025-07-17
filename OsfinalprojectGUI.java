@@ -203,16 +203,12 @@ public class OsfinalprojectGUI extends JFrame {
             if (manualInputRadio.isSelected()) {
                 for (int i = 0; i < numProc; i++) {
                     JPanel row = (JPanel) processInputPanel.getComponent(i);
-                    JTextField atField = (JTextField) row.getComponent(2); // Assuming order: Label, AT_Field, Label, BT_Field
-                    JTextField btField = (JTextField) row.getComponent(4);
+                    JTextField atField = (JTextField) row.getComponent(1); // Arrival Time
+                    JTextField btField = (JTextField) row.getComponent(3); // Burst Time
                     try {
                         int arrivalTime = Integer.parseInt(atField.getText());
                         int burstTime = Integer.parseInt(btField.getText());
-                        if (arrivalTime < 0 || burstTime <= 0) {
-                             JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "Arrival time cannot be negative, Burst time must be positive.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                             return;
-                        }
-                        processes.add(new Process(i, arrivalTime, burstTime));
+                        processes.add(new Process(i, arrivalTime, burstTime)); // Add the process to the list
                     } catch (NumberFormatException ex) {
                         JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "Invalid Arrival or Burst Time for Process " + i, "Input Error", JOptionPane.ERROR_MESSAGE);
                         return;
