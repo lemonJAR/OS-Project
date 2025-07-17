@@ -55,7 +55,9 @@ public class Osfinalproject {
                 scheduler = new SRTF(processes);
                 break;
             case 4:
-                //round robin
+                System.out.println("Enter Time Quantum for Round Robin:");
+                int rrQuantum = scanner.nextInt();
+                scheduler = new RoundRobin(processes, rrQuantum);
                 break;
             case 5:
                 //mlfq
