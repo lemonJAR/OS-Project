@@ -1,9 +1,9 @@
 # OS-Project
-Project Overview:
+**Project Overview:**
 
 This project is a **CPU Scheduling Visualizer** built in Java. It lets users simulate different CPU scheduling algorithms like **FCFS, SJF, SRTF, Round Robin**, and **MLFQ**. Users can enter processes manually or generate them randomly. The results are shown as an Gantt chart with key process metrics such as completion time, turnaround time, and response time.
 
-HOW TO RUN THE SIMULATION:
+**HOW TO RUN THE SIMULATION:**
 - When you execute the program, the simulator should appear
 
 - When opening the simulator, you are given a choice at the top left of the window a choice to either manually input the processes or randomly generate the processes under that is a text box to type the amount of processes you wish to input.
@@ -15,9 +15,15 @@ HOW TO RUN THE SIMULATION:
 
 - Then you can press the Run Simulation button to visualize the processes.
 
-    <img width="1218" height="847" alt="Screenshot 2025-07-18 003932" src="https://github.com/user-attachments/assets/331995e2-181a-4ef2-bdd0-2396b50ae5c0" />
+ <img width="1218" height="847" alt="Screenshot 2025-07-18 003932" src="https://github.com/user-attachments/assets/331995e2-181a-4ef2-bdd0-2396b50ae5c0" />
+ 
+**Sample input and expected output:**
+<img width="1227" height="857" alt="image" src="https://github.com/user-attachments/assets/c25d8df2-14e6-4947-87e8-3643e09e38a9" />
 
-Member Roles And Contributions:
+<img width="1225" height="857" alt="image" src="https://github.com/user-attachments/assets/95871a50-da9b-4862-a383-347edc7f6255" />
+
+
+**Member Roles And Contributions:**
 - Edcel Christian Repollo was tasked to finish the ui, gantt chartt, srtf, round robin, and mlfq
 
 - John Anthony Romeo was taskes to finsih the process, scheduler, FIFO, SJF
