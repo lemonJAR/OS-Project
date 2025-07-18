@@ -15,6 +15,19 @@ This project is a **CPU Scheduling Visualizer** built in Java. It lets users sim
 
 - Then you can press the Run Simulation button to visualize the processes.
 
+**Description of each scheduling algorithm:**
+- FCFS (First-Come, First-Served) Processes are executed in the order they arrive, without preemption.
+
+- SJF (Shortest Job First) Executes the process with the shortest burst time first, non-preemptively.
+
+- SRTF (Shortest Remaining Time First) Runs the process with the least remaining burst time and preempts if a shorter one arrives.
+
+- RR (Round Robin) Gives each process a fixed time slice and cycles through them fairly.
+
+- MLFQ (Multi-Level Feedback Queue) Uses multiple priority queues to adaptively schedule processes based on their behavior and CPU usage.
+
+
+
  <img width="1218" height="847" alt="Screenshot 2025-07-18 003932" src="https://github.com/user-attachments/assets/331995e2-181a-4ef2-bdd0-2396b50ae5c0" />
 
  
