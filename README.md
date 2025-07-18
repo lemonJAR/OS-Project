@@ -16,7 +16,7 @@ This project is a **CPU Scheduling Visualizer** built in Java. It lets users sim
 - Then you can press the Run Simulation button to visualize the processes.
 
 **Description of each scheduling algorithm:**
-- FCFS (First-Come, First-Served) Processes are executed in the order they arrive, without preemption.
+- FCFS (First-Come, First-Served) / FIFO (First in, First Out) Processes are executed in the order they arrive, without preemption.
 
 - SJF (Shortest Job First) Executes the process with the shortest burst time first, non-preemptively.
 
