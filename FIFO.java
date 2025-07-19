@@ -39,8 +39,8 @@ public class FIFO extends Scheduler {
             }
             currentTime += p.burstTime;
 
-            p.completionTime = currentTime;
-            p.turnaroundTime = currentTime - p.arrivalTime;
+            p.completionTime = currentTime -1;
+            p.turnaroundTime = (currentTime - p.arrivalTime) -1;
         }
 
         printMetrics();

@@ -13,32 +13,34 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.io.ByteArrayOutputStream; // Import for output capture
+import java.io.PrintStream;           // Import for output capture
 
 public class OsfinalprojectGUI extends JFrame {
-
     // Input Components
     private JRadioButton manualInputRadio, autoGenerateRadio;
     private ButtonGroup inputMethodGroup;
     private JTextField numProcessesField;
-    private JPanel processInputPanel; // For manual process details
+    private JPanel processInputPanel;
     private JComboBox<String> algorithmComboBox;
-    private JTextField quantumField; // For RR and MLFQ quantums
-    private JLabel quantumLabel;
+    private JTextField quantumField; // For RR quantum
+    private JTextField timeSlicesField, allotmentTimesField; // For MLFQ
+    private JLabel quantumLabel, timeSlicesLabel, allotmentTimesLabel;
     private JButton runSimulationButton;
 
     // Output Components
     private JTextArea metricsTextArea;
     private JLabel avgTurnaroundLabel, avgResponseLabel;
-    private GanttChartPanel ganttChartPanel; // Custom panel for drawing Gantt chart
+    private GanttChartPanel ganttChartPanel;
 
-    private List<Process> processes; // List to hold processes for simulation
+    private List<Process> processes;
 
     public OsfinalprojectGUI() {
         super("OS Scheduling Simulator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
         setSize(1000, 700);
-        setLocationRelativeTo(null); // Center the window
+        setLocationRelativeTo(null);
 
         processes = new ArrayList<>();
 
@@ -55,7 +57,7 @@ public class OsfinalprojectGUI extends JFrame {
         inputMethodGroup = new ButtonGroup();
         inputMethodGroup.add(manualInputRadio);
         inputMethodGroup.add(autoGenerateRadio);
-        autoGenerateRadio.setSelected(true); // Default selection
+        autoGenerateRadio.setSelected(true);
 
         JPanel radioPanel = new JPanel();
         radioPanel.add(manualInputRadio);
@@ -70,16 +72,16 @@ public class OsfinalprojectGUI extends JFrame {
         numProcessesField = new JTextField("5", 5);
         inputPanel.add(numProcessesField, gbc);
 
-        // Manual Process Input Panel (initially hidden/empty)
+        // Manual Process Input Panel
         processInputPanel = new JPanel();
         processInputPanel.setLayout(new BoxLayout(processInputPanel, BoxLayout.Y_AXIS));
         processInputPanel.setBorder(BorderFactory.createTitledBorder("Process Details (PID, Arrival, Burst)"));
         JScrollPane scrollPane = new JScrollPane(processInputPanel);
         scrollPane.setPreferredSize(new Dimension(300, 150));
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
-        gbc.weighty = 0.5; // Allow vertical expansion
+        gbc.weighty = 0.5;
         inputPanel.add(scrollPane, gbc);
-        gbc.weighty = 0; // Reset
+        gbc.weighty = 0;
 
         // Algorithm Selection
         gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 1;
@@ -89,16 +91,32 @@ public class OsfinalprojectGUI extends JFrame {
         algorithmComboBox = new JComboBox<>(algorithms);
         inputPanel.add(algorithmComboBox, gbc);
 
-        // Quantum Input
+        // RR Quantum
         gbc.gridx = 0; gbc.gridy = 4;
-        quantumLabel = new JLabel("Time Quantum:");
+        quantumLabel = new JLabel("RR Quantum:");
         inputPanel.add(quantumLabel, gbc);
         gbc.gridx = 1; gbc.gridy = 4;
-        quantumField = new JTextField("2", 5); // Default for RR
+        quantumField = new JTextField("2", 5);
         inputPanel.add(quantumField, gbc);
 
+        // MLFQ Time Slices
+        gbc.gridx = 0; gbc.gridy = 5;
+        timeSlicesLabel = new JLabel("MLFQ Time Slices (Q0-Q3):");
+        inputPanel.add(timeSlicesLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 5;
+        timeSlicesField = new JTextField("4,8,16,INF", 15);
+        inputPanel.add(timeSlicesField, gbc);
+
+        // MLFQ Allotment Times
+        gbc.gridx = 0; gbc.gridy = 6;
+        allotmentTimesLabel = new JLabel("MLFQ Allotment Times (A0-A3):");
+        inputPanel.add(allotmentTimesLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 6;
+        allotmentTimesField = new JTextField("5,10,20,INF", 15);
+        inputPanel.add(allotmentTimesField, gbc);
+
         // Run Simulation Button
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2;
         runSimulationButton = new JButton("Run Simulation");
         inputPanel.add(runSimulationButton, gbc);
 
@@ -108,22 +126,19 @@ public class OsfinalprojectGUI extends JFrame {
         JPanel outputPanel = new JPanel(new BorderLayout(5, 5));
         outputPanel.setBorder(BorderFactory.createTitledBorder("Simulation Results"));
 
-        // Metrics Area
         metricsTextArea = new JTextArea(10, 40);
         metricsTextArea.setEditable(false);
         metricsTextArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         outputPanel.add(new JScrollPane(metricsTextArea), BorderLayout.NORTH);
 
-        // Averages
         JPanel avgPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         avgTurnaroundLabel = new JLabel("Average Turnaround Time: N/A");
         avgResponseLabel = new JLabel("Average Response Time: N/A");
         avgPanel.add(avgTurnaroundLabel);
-        avgPanel.add(Box.createHorizontalStrut(20)); // Spacer
+        avgPanel.add(Box.createHorizontalStrut(20));
         avgPanel.add(avgResponseLabel);
         outputPanel.add(avgPanel, BorderLayout.CENTER);
 
-        // Gantt Chart Panel
         ganttChartPanel = new GanttChartPanel();
         ganttChartPanel.setPreferredSize(new Dimension(600, 200));
         ganttChartPanel.setBorder(BorderFactory.createTitledBorder("Gantt Chart"));
@@ -131,15 +146,15 @@ public class OsfinalprojectGUI extends JFrame {
 
         add(outputPanel, BorderLayout.CENTER);
 
-        // --- Event Listeners ---
+        // Event Listeners
         manualInputRadio.addActionListener(e -> toggleInputMethod(true));
         autoGenerateRadio.addActionListener(e -> toggleInputMethod(false));
-        algorithmComboBox.addActionListener(e -> updateQuantumFieldVisibility());
+        algorithmComboBox.addActionListener(e -> updateInputVisibility());
         runSimulationButton.addActionListener(new RunSimulationListener());
 
-        // Initial state setup
-        toggleInputMethod(false); // Start with auto-generate
-        updateQuantumFieldVisibility();
+        // Initial state
+        toggleInputMethod(false);
+        updateInputVisibility();
     }
 
     private void toggleInputMethod(boolean isManual) {
@@ -149,44 +164,44 @@ public class OsfinalprojectGUI extends JFrame {
             try {
                 numProc = Integer.parseInt(numProcessesField.getText());
             } catch (NumberFormatException ex) {
-                numProc = 0; // Or show error
+                numProc = 0;
             }
             for (int i = 0; i < numProc; i++) {
                 JPanel row = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 row.add(new JLabel("P" + i + ": AT="));
-                row.add(new JTextField(String.valueOf(0), 3)); // Arrival Time
+                row.add(new JTextField("0", 3));
                 row.add(new JLabel("BT="));
-                row.add(new JTextField(String.valueOf(5), 3)); // Burst Time
+                row.add(new JTextField("5", 3));
                 processInputPanel.add(row);
             }
             processInputPanel.revalidate();
             processInputPanel.repaint();
         }
-        // For auto-generate, processInputPanel remains empty
     }
 
-    private void updateQuantumFieldVisibility() {
+    private void updateInputVisibility() {
         String selectedAlgorithm = (String) algorithmComboBox.getSelectedItem();
-        boolean showQuantum = selectedAlgorithm.equals("Round Robin") || selectedAlgorithm.equals("MLFQ");
-        quantumLabel.setVisible(showQuantum);
-        quantumField.setVisible(showQuantum);
-        if (selectedAlgorithm.equals("MLFQ")) {
-            quantumLabel.setText("Quantums (Q0,Q1,Q2,Q3):");
-            quantumField.setText("2,4,8,16"); // Default MLFQ quantums
-        } else {
-            quantumLabel.setText("Time Quantum:");
-            quantumField.setText("2"); // Default RR quantum
-        }
+        
+        boolean showRRQuantum = selectedAlgorithm.equals("Round Robin");
+        boolean showMLFQParams = selectedAlgorithm.equals("MLFQ");
+        
+        quantumLabel.setVisible(showRRQuantum);
+        quantumField.setVisible(showRRQuantum);
+        
+        timeSlicesLabel.setVisible(showMLFQParams);
+        timeSlicesField.setVisible(showMLFQParams);
+        allotmentTimesLabel.setVisible(showMLFQParams);
+        allotmentTimesField.setVisible(showMLFQParams);
     }
 
     private class RunSimulationListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            processes.clear(); // Clear previous processes
+            processes.clear();
             metricsTextArea.setText("");
             avgTurnaroundLabel.setText("Average Turnaround Time: N/A");
             avgResponseLabel.setText("Average Response Time: N/A");
-            ganttChartPanel.setGanttChart(new ArrayList<>()); // Clear Gantt chart
+            ganttChartPanel.setGanttChart(new ArrayList<>());
 
             int numProc;
             try {
@@ -226,8 +241,8 @@ public class OsfinalprojectGUI extends JFrame {
             // Create a deep copy of processes for each simulation run
             // This is crucial because scheduling algorithms modify process states
             List<Process> processesForSimulation = processes.stream()
-                                                            .map(p -> new Process(p.id, p.arrivalTime, p.burstTime))
-                                                            .collect(Collectors.toList());
+                .map(p -> new Process(p.id, p.arrivalTime, p.burstTime))
+                .collect(Collectors.toList());
 
             Scheduler scheduler = null;
             String selectedAlgorithm = (String) algorithmComboBox.getSelectedItem();
@@ -244,74 +259,88 @@ public class OsfinalprojectGUI extends JFrame {
                         scheduler = new SRTF(processesForSimulation);
                         break;
                     case "Round Robin":
-                        int rrQuantum = Integer.parseInt(quantumField.getText());
-                        if (rrQuantum <= 0) {
-                            JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "Time quantum must be positive.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
+                        int rrQuantum = parseQuantum(quantumField.getText());
                         scheduler = new RoundRobin(processesForSimulation, rrQuantum);
                         break;
                     case "MLFQ":
-                        String[] quantumStrings = quantumField.getText().split(",");
-                        if (quantumStrings.length != 4) {
-                            JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "MLFQ requires 4 comma-separated quantums (Q0,Q1,Q2,Q3).", "Input Error", JOptionPane.ERROR_MESSAGE);
-                            return;
-                        }
-                        int[] mlfqQuantums = new int[4];
-                        for (int i = 0; i < 4; i++) {
-                            mlfqQuantums[i] = Integer.parseInt(quantumStrings[i].trim());
-                            if (mlfqQuantums[i] <= 0) {
-                                JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "MLFQ quantums must be positive.", "Input Error", JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
-                        }
-                        scheduler = new MLFQ(processesForSimulation, mlfqQuantums);
+                        int[] timeSlices = parseCommaSeparatedInts(timeSlicesField.getText(), "Time Slices");
+                        int[] allotmentTimes = parseCommaSeparatedInts(allotmentTimesField.getText(), "Allotment Times");
+                        scheduler = new MLFQ(processesForSimulation, timeSlices, allotmentTimes);
                         break;
-                    default:
-                        JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "Unknown algorithm selected.", "Error", JOptionPane.ERROR_MESSAGE);
-                        return;
                 }
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "Invalid quantum value(s). Please enter integers.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(OsfinalprojectGUI.this, 
+                    "Invalid input: " + ex.getMessage(), "Input Error", JOptionPane.ERROR_MESSAGE);
                 return;
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(OsfinalprojectGUI.this, "An error occurred during scheduler initialization: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-                ex.printStackTrace();
+            } catch (IllegalArgumentException ex) { // Catch specific exceptions from scheduler constructors
+                JOptionPane.showMessageDialog(OsfinalprojectGUI.this, 
+                    "Configuration Error: " + ex.getMessage(), "Setup Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
+
             if (scheduler != null) {
                 // Redirect System.out to capture print statements
-                // This is a bit hacky but allows reusing existing printMetrics/printAverages
-                // A better approach would be to modify Scheduler to return data structures
-                // instead of printing directly.
-                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                java.io.PrintStream ps = new java.io.PrintStream(baos);
-                java.io.PrintStream old = System.out;
-                System.setOut(ps);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                PrintStream ps = new PrintStream(baos);
+                PrintStream old = System.out; // Store original System.out
+                System.setOut(ps); // Redirect System.out to our stream
 
-                scheduler.schedule();
+                try {
+                    scheduler.schedule(); // Run the simulation
+                } finally {
+                    System.out.flush(); // Ensure all buffered output is written
+                    System.setOut(old); // Restore original System.out
+                }
 
-                System.out.flush();
-                System.setOut(old); // Restore System.out
-
-                metricsTextArea.setText(baos.toString());
+                metricsTextArea.setText(baos.toString()); // Set the captured output to the text area
 
                 // Update averages from the scheduler's calculated values
                 double totalTurnaround = 0;
                 double totalResponse = 0;
+                int completedProcessesCount = 0;
                 for (Process p : processesForSimulation) { // Use the processes from the simulation
-                    totalTurnaround += p.turnaroundTime;
-                    totalResponse += p.responseTime;
+                    if (p.completionTime > 0) { // Only count completed processes for averages
+                        totalTurnaround += p.turnaroundTime;
+                        totalResponse += p.responseTime;
+                        completedProcessesCount++;
+                    }
                 }
-                avgTurnaroundLabel.setText(String.format("Average Turnaround Time: %.2f", totalTurnaround / processesForSimulation.size()));
-                avgResponseLabel.setText(String.format("Average Response Time: %.2f", totalResponse / processesForSimulation.size()));
+                
+                if (completedProcessesCount > 0) {
+                    avgTurnaroundLabel.setText(String.format("Average Turnaround Time: %.2f", totalTurnaround / completedProcessesCount));
+                    avgResponseLabel.setText(String.format("Average Response Time: %.2f", totalResponse / completedProcessesCount));
+                } else {
+                    avgTurnaroundLabel.setText("Average Turnaround Time: N/A");
+                    avgResponseLabel.setText("Average Response Time: N/A");
+                }
 
                 // Update Gantt Chart
                 ganttChartPanel.setGanttChart(scheduler.ganttChart);
             }
         }
+
+        private int parseQuantum(String input) throws NumberFormatException {
+            if (input.equalsIgnoreCase("INF")) {
+                return Integer.MAX_VALUE;
+            }
+            int value = Integer.parseInt(input);
+            if (value <= 0) {
+                throw new NumberFormatException("Value must be positive");
+            }
+            return value;
+        }
+
+        private int[] parseCommaSeparatedInts(String input, String paramName) throws NumberFormatException {
+            String[] parts = input.split(",");
+            if (parts.length != 4) {
+                throw new NumberFormatException(paramName + " requires exactly 4 comma-separated values");
+            }
+            int[] result = new int[4];
+            for (int i = 0; i < 4; i++) {
+                result[i] = parseQuantum(parts[i].trim());
+            }
+            return result;
+        }
     }
-
 }
-

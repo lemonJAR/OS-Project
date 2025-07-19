@@ -73,8 +73,8 @@ public class RoundRobin extends Scheduler {
             if (current.remainingBurstTime > 0) {
                 readyQueue.add(current); // Re-add to the end of the queue
             } else {
-                current.completionTime = currentTime;
-                current.turnaroundTime = currentTime - current.arrivalTime;
+                current.completionTime = currentTime - 1;
+                current.turnaroundTime = (currentTime - current.arrivalTime) - 1;
             }
         }
 
