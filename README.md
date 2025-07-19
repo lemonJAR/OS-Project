@@ -38,7 +38,8 @@ This project is a **CPU Scheduling Visualizer** built in Java. It lets users sim
 
 
 **Known bugs, limitations or incomplete features:**
-- As far as we know, we haven't seen any bugs.
+- As the processes increase the gantt chart size decreases.
+- The Process details wont be locked when moving from manual to Auto generate
 
 **Member Roles And Contributions:**
 - Edcel Christian Repollo was tasked to finish the ui, gantt chartt, srtf, round robin, and mlfq
